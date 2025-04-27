@@ -104,79 +104,44 @@ class Renderer {
     
     // Główna metoda renderująca
     render() {
-        // Wyczyść canvas
         this.ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
-        
-        // Tablica wszystkich ścian do narysowania
         const allFaces = [];
-        
-        // Przygotuj wszystkie ściany ze wszystkich sześcianów
+    
+        // Збір всіх граней
         for (const cube of this.scene.cubes) {
-            // Przekształć wierzchołki sześcianu
             const transformedVertices = cube.transform(this.camera);
-            
-            // Dodaj wszystkie ściany do listy
             for (const face of cube.faces) {
-                // Sprawdź, czy ściana jest widoczna (dot product z normalną)
                 const normal = face.normal;
                 const v0 = transformedVertices[face.vertices[0]];
-                
-                // Wektor od kamery do ściany
                 const viewVector = { x: v0.x, y: v0.y, z: v0.z };
-                
-                // Iloczyn skalarny (jeśli < 0, ściana jest widoczna)
                 const dot = normal.x * viewVector.x + normal.y * viewVector.y + normal.z * viewVector.z;
-                
-                // W trybie wireframe dodaj wszystkie ściany, w trybie pełnym tylko widoczne
+    
                 if (this.wireframeMode || dot < 0) {
                     allFaces.push({
                         transformedVertices,
                         face,
-                        depth: 0,  // Tymczasowa głębokość
-                        isVisible: dot < 0  // Zapamiętaj, czy ściana jest widoczna
+                        depth: 0,
+                        isVisible: dot < 0
                     });
                 }
             }
         }
-        
-        // Oblicz głębokość dla każdej ściany
+    
+        // Сортування за глибиною
         for (const faceInfo of allFaces) {
             const avgDepth = faceInfo.transformedVertices.reduce((sum, v) => sum + v.z, 0) / 
                             faceInfo.transformedVertices.length;
             faceInfo.depth = avgDepth;
         }
-        
-        // Posortuj ściany według głębokości (algorytm malarski)
         allFaces.sort((a, b) => b.depth - a.depth);
-        
-        // Renderuj ściany od najdalszej do najbliższej
+    
+        // Рендеринг
         for (const faceInfo of allFaces) {
-            // W trybie wireframe ustaw przezroczystość dla niewidocznych ścian
-            if (this.wireframeMode && !faceInfo.isVisible) {
-                // Zmień kolor na bardziej przezroczysty dla niewidocznych ścian
-                const originalColor = faceInfo.face.color;
-                
-                // Ekstrahuj wartości RGB
-                const rgbMatch = originalColor.match(/rgb\((\d+),\s*(\d+),\s*(\d+)\)/);
-                if (rgbMatch) {
-                    const r = rgbMatch[1];
-                    const g = rgbMatch[2];
-                    const b = rgbMatch[3];
-                    
-                    // Ustaw nowy kolor z przezroczystością
-                    faceInfo.face.color = `rgba(${r}, ${g}, ${b}, 0.3)`;
-                    
-                    // Renderuj ścianę
-                    this.renderFace(faceInfo.transformedVertices, faceInfo.face);
-                    
-                    // Przywróć oryginalny kolor
-                    faceInfo.face.color = originalColor;
-                } else {
-                    // Fallback jeśli nie udało się rozparsować koloru
-                    this.renderFace(faceInfo.transformedVertices, faceInfo.face);
-                }
+            if (this.wireframeMode) {
+                // Wireframe: всі грані відображаються без прозорості
+                this.renderFace(faceInfo.transformedVertices, faceInfo.face);
             } else {
-                // Standardowe renderowanie
+                // Звичайний режим: тільки видимі грані
                 this.renderFace(faceInfo.transformedVertices, faceInfo.face);
             }
         }
