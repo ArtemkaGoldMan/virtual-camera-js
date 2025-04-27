@@ -3,50 +3,28 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Virtual Camera 3D</title>
-    <style>
-        body {
-            margin: 0;
-            overflow: hidden;
-            background: #1a1a1a;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            height: 100vh;
-        }
-        canvas {
-            border: 1px solid #333;
-        }
-        .controls {
-            position: fixed;
-            top: 10px;
-            left: 10px;
-            color: white;
-            font-family: monospace;
-            background: rgba(0, 0, 0, 0.7);
-            padding: 10px;
-            border-radius: 5px;
-        }
-    </style>
+    <title>Wirtualna Kamera 3D</title>
+    <link rel="stylesheet" href="styles.css">
 </head>
 <body>
+    <canvas id="canvas"></canvas>
     <div class="controls">
-        <h3>Controls:</h3>
-        <p>Movement: W,A,S,D (forward, left, back, right)</p>
-        <p>Up/Down: Q,E</p>
-        <p>Rotation: Arrow keys</p>
-        <p>Roll: Z,C</p>
-        <p>Zoom: +,-</p>
-        <p>View Mode: M (toggle wireframe)</p>
+        <h2>Sterowanie Kamerą 3D</h2>
+        <p>W, S - Ruch przód/tył</p>
+        <p>A, D - Ruch lewo/prawo</p>
+        <p>Q, E - Ruch góra/dół</p>
+        <p>Strzałki - Obrót kamery</p>
+        <p>Z, X - Zoom (zmiana FOV)</p>
+        <p>R - Reset kamery</p>
+        <p>T - Przełącz tryb wireframe/pełny</p>
+        <p>G - Płynna animacja do losowej orientacji</p>
     </div>
-    <canvas id="canvas3d"></canvas>
-    <script src="js/math/Matrix.js"></script>
-    <script src="js/math/Vector3.js"></script>
-    <script src="js/math/Quaternion.js"></script>
-    <script src="js/geometry/Point3D.js"></script>
-    <script src="js/geometry/Cube.js"></script>
-    <script src="js/Camera.js"></script>
-    <script src="js/Scene.js"></script>
-    <script src="js/main.js"></script>
+
+    <script src="quaternion.js"></script>
+    <script src="vector.js"></script>
+    <script src="camera.js"></script>
+    <script src="scene.js"></script>
+    <script src="renderer.js"></script>
+    <script src="main.js"></script>
 </body>
 </html>
