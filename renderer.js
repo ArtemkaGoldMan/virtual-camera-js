@@ -31,12 +31,22 @@ class Renderer {
         this.screenCenterY = this.screenHeight / 2;
         
         // Update camera aspect ratio
-        this.camera.aspect = this.canvas.width / this.canvas.height;
+        this.camera.aspect = this.canvas.width / this.camera.height;
     }
     
     // Set wireframe mode
     setWireframeMode(enabled) {
         this.wireframeMode = enabled;
+    }
+    
+    // Format coordinate number with leading zeros (5 digits)
+    formatCoordinate(value) {
+        // Convert to integer (remove decimal part)
+        const intValue = Math.floor(Math.abs(value) * 100);
+        // Format with leading zeros to 5 digits
+        const formatted = intValue.toString().padStart(5, '0');
+        // Add minus sign if negative
+        return value < 0 ? `-${formatted}` : formatted;
     }
     
     // Rzutowanie punktu 3D na ekran 2D
@@ -102,12 +112,87 @@ class Renderer {
         return avgDepth;
     }
     
+    // Rysowanie osi współrzędnych
+    renderAxis() {
+        const axisLength = 1.0; // Długość osi
+        const origin = { x: 0, y: 0, z: 0 };
+        
+        // Osie lokalne kamery
+        const axes = [
+            { end: this.camera.right.multiply(axisLength), color: '#FF0000' }, // X - czerwony
+            { end: this.camera.up.multiply(axisLength), color: '#00FF00' }, // Y - zielony
+            { end: this.camera.forward.multiply(axisLength), color: '#0000FF' } // Z - niebieski
+        ];
+        
+        // Pozycja wyświetlania na ekranie
+        const axisOriginX = 80;
+        const axisOriginY = this.screenHeight - 80;
+        
+        // Rysuj osie
+        for (const axis of axes) {
+            this.ctx.beginPath();
+            this.ctx.moveTo(axisOriginX, axisOriginY);
+            
+            // Oblicz końcową pozycję osi
+            const endX = axisOriginX + axis.end.x * 40;
+            const endY = axisOriginY - axis.end.y * 40; // Odwróć Y (ekranowa oś Y rośnie w dół)
+            
+            this.ctx.lineTo(endX, endY);
+            this.ctx.strokeStyle = axis.color;
+            this.ctx.lineWidth = 3;
+            this.ctx.stroke();
+        }
+        
+        // Etykiety osi
+        this.ctx.font = '12px Arial';
+        this.ctx.fillStyle = '#FFFFFF';
+        this.ctx.fillText('X', axisOriginX + 45, axisOriginY);
+        this.ctx.fillText('Y', axisOriginX, axisOriginY - 45);
+        this.ctx.fillText('Z', axisOriginX + 20, axisOriginY - 20);
+    }
+    
+    // Wyświetlanie współrzędnych kamery
+    renderCoordinates() {
+        const pos = this.camera.position;
+        
+        // Wyświetl współrzędne
+        this.ctx.font = '14px Arial';
+        this.ctx.fillStyle = '#FFFFFF';
+        this.ctx.textAlign = 'left';
+        
+        // Tło dla tekstu
+        this.ctx.fillStyle = 'rgba(0, 0, 0, 0.5)';
+        this.ctx.fillRect(10, 10, 200, 100);
+        
+        // Wyświetl współrzędne z formatowaniem
+        this.ctx.fillStyle = '#FFFFFF';
+        this.ctx.fillText(`Pozycja kamery:`, 20, 30);
+        
+        // Formated display with leading zeros
+        this.ctx.fillText(`X: ${this.formatCoordinate(pos.x)}`, 20, 50);
+        this.ctx.fillText(`Y: ${this.formatCoordinate(pos.y)}`, 20, 70);
+        this.ctx.fillText(`Z: ${this.formatCoordinate(pos.z)}`, 20, 90);
+        
+        // Dodatkowy wyświetlacz współrzędnych w stylu "komputerowym" 
+        // (jak z przykładu: x: 00031 y: 031203 z: 13001)
+        this.ctx.font = 'bold 16px monospace';
+        this.ctx.fillStyle = '#00FF00'; // Zielony kolor dla "komputerowego" wyglądu
+        
+        // Pozycja w prawym górnym rogu
+        const textX = this.screenWidth - 150;
+        const textY = 30;
+        
+        this.ctx.fillText(`x:${this.formatCoordinate(pos.x)}`, textX, textY);
+        this.ctx.fillText(`y:${this.formatCoordinate(pos.y)}`, textX, textY + 25);
+        this.ctx.fillText(`z:${this.formatCoordinate(pos.z)}`, textX, textY + 50);
+    }
+    
     // Główna metoda renderująca
     render() {
         this.ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
         const allFaces = [];
     
-        // Збір всіх граней
+        // Zbieranie wszystkich ścian
         for (const cube of this.scene.cubes) {
             const transformedVertices = cube.transform(this.camera);
             for (const face of cube.faces) {
@@ -127,7 +212,7 @@ class Renderer {
             }
         }
     
-        // Сортування за глибиною
+        // Sortowanie według głębokości
         for (const faceInfo of allFaces) {
             const avgDepth = faceInfo.transformedVertices.reduce((sum, v) => sum + v.z, 0) / 
                             faceInfo.transformedVertices.length;
@@ -135,15 +220,19 @@ class Renderer {
         }
         allFaces.sort((a, b) => b.depth - a.depth);
     
-        // Рендеринг
+        // Renderowanie
         for (const faceInfo of allFaces) {
             if (this.wireframeMode) {
-                // Wireframe: всі грані відображаються без прозорості
+                // Wireframe: wszystkie ściany są widoczne
                 this.renderFace(faceInfo.transformedVertices, faceInfo.face);
             } else {
-                // Звичайний режим: тільки видимі грані
+                // Zwykły tryb: tylko widoczne ściany
                 this.renderFace(faceInfo.transformedVertices, faceInfo.face);
             }
         }
+        
+        // Wyświetl osie i współrzędne kamery
+        this.renderAxis();
+        this.renderCoordinates();
     }
 }

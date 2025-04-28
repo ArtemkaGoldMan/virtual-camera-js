@@ -72,6 +72,10 @@ function init() {
         if (keys['arrowleft']) camera.rotate('y', -rotateSpeed);
         if (keys['arrowright']) camera.rotate('y', rotateSpeed);
         
+        // Obrót kamery wokół osi Z (C/V)
+        if (keys['c']) camera.rotate('z', -rotateSpeed);
+        if (keys['v']) camera.rotate('z', rotateSpeed);
+        
         // Zoom (Z/X)
         if (keys['z']) camera.zoom(-0.02);
         if (keys['x']) camera.zoom(0.02);
