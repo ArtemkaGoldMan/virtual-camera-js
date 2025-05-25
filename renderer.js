@@ -208,16 +208,6 @@ class Renderer {
     renderCoordinates() {
         const pos = this.camera.position;
 
-        this.ctx.font = '14px Arial';
-        this.ctx.fillStyle = 'rgba(0, 0, 0, 0.5)';
-        this.ctx.fillRect(10, 10, 200, 100);
-
-        this.ctx.fillStyle = '#FFFFFF';
-        this.ctx.fillText(`Позиція камери:`, 20, 30);
-        this.ctx.fillText(`X: ${this.formatCoordinate(pos.x)}`, 20, 50);
-        this.ctx.fillText(`Y: ${this.formatCoordinate(pos.y)}`, 20, 70);
-        this.ctx.fillText(`Z: ${this.formatCoordinate(pos.z)}`, 20, 90);
-
         this.ctx.font = 'bold 16px monospace';
         this.ctx.fillStyle = '#00FF00';
         const textX = this.screenWidth - 150;
