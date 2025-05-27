@@ -76,12 +76,18 @@ class Cube {
 
 class Scene {
     constructor() {
-        // Utwórz cztery sześciany na scenie
         this.cubes = [
-            new Cube(new Vector3(0, 0, 0), 2, '#FF4444'),
-            new Cube(new Vector3(-4, 1, -2), 1.5, '#44FF44'),
-            new Cube(new Vector3(3, -1, 2), 1.2, '#4444FF'),
-            new Cube(new Vector3(1, 3, -4), 1.8, '#FFFF44')
+            // 🟦 Куб 1 — окремо
+            new Cube(new Vector3(-5, 0, 2), 2, '#FF4444'),
+
+            // 🟩 Куб 2 — окремо
+            new Cube(new Vector3(4, 2, -3), 1.8, '#44FF44'),
+
+            // 🟥 Куб 3 — основа для перетину
+            new Cube(new Vector3(0, 0, 0), 2, '#4444FF'),
+
+            // 🟨 Куб 4 — трохи всередині куба 3
+            new Cube(new Vector3(0.8, 0.8, 0.8), 1.5, '#FFFF44')
         ];
     }
 }

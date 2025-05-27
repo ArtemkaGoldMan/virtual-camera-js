@@ -12,7 +12,7 @@ class Renderer {
         this.screenCenterX = this.screenWidth / 2;
         this.screenCenterY = this.screenHeight / 2;
 
-        this.subdivisionLevel = 2;
+        this.subdivisionLevel = 40;
 
         this.resize();
         window.addEventListener('resize', () => this.resize());
